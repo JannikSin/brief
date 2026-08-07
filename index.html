@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Brief</title>
+<meta name="theme-color" content="#17171a">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+:root{
+  color-scheme: light dark;
+  --bg:#f5f5f4; --card:#fff; --edge:#e5e5e3; --ink:#1a1a1a; --dim:#666;
+  --accent:#6b5bd2; --accent2:#8a7bf0; --chip:#f0eefb; --chipink:#5a4bb8;
+  --bar:#e7e6ef; --hover:#faf9ff; --hoveredge:#e8e3fa; --warn:#a15c00; --warnbg:#fff3e0;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#17171a; --card:#212127; --edge:#33333a; --ink:#e8e8e8; --dim:#a5a5ad;
+    --accent:#a99bf5; --accent2:#8a7bf0; --chip:#2c2a3a; --chipink:#c9c4e8;
+    --bar:#2c2c34; --hover:#26262e; --hoveredge:#3a3a45; --warn:#ffb85c; --warnbg:#33270f;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+  line-height:1.5;color:var(--ink);background:var(--bg);
+  padding:calc(14px + env(safe-area-inset-top)) 14px calc(30px + env(safe-area-inset-bottom));}
+.wrap{max-width:640px;margin:0 auto}
+header{border-bottom:3px solid var(--accent);padding-bottom:10px;margin-bottom:6px}
+header h1{margin:0;font-size:1.35rem}
+header .date{color:var(--dim);font-size:.9rem;margin-top:3px}
+header .built{color:var(--dim);font-size:.78rem;margin-top:2px}
+.bar{height:8px;border-radius:99px;background:var(--bar);overflow:hidden;margin-top:10px}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .25s ease}
+.count{font-size:.85rem;color:var(--dim);margin-top:5px;display:flex;justify-content:space-between;gap:10px}
+.count b{color:var(--accent)}
+#sync{font-size:.76rem;color:var(--dim)}
+.banner{margin:10px 0 0;padding:9px 12px;border-radius:10px;background:var(--warnbg);color:var(--warn);font-size:.86rem}
+details.card{background:var(--card);border:1px solid var(--edge);border-radius:12px;
+  padding:0;margin:12px 0;box-shadow:0 1px 3px rgba(0,0,0,.05);overflow:hidden}
+details.card>summary{list-style:none;cursor:pointer;padding:13px 16px;display:flex;gap:8px;align-items:baseline;
+  font-weight:600;color:var(--accent);font-size:1rem;-webkit-tap-highlight-color:transparent}
+details.card>summary::-webkit-details-marker{display:none}
+details.card>summary .n{margin-left:auto;font-size:.76rem;font-weight:500;color:var(--dim);white-space:nowrap}
+details.card>summary::after{content:"›";color:var(--dim);transform:rotate(90deg);transition:transform .15s;margin-left:6px}
+details[open].card>summary::after{transform:rotate(-90deg)}
+.cardbody{padding:0 16px 14px}
+.cardbody p{margin:.4rem 0}
+.cardbody ul{margin:.4rem 0;padding-left:1.2rem}
+.cardbody li{margin:.2rem 0}
+.cardbody a{color:var(--accent);word-break:break-word}
+.cardbody code{background:var(--chip);color:var(--chipink);padding:1px 5px;border-radius:4px;font-size:.9em}
+.wiki{color:var(--chipink);background:var(--chip);padding:1px 6px;border-radius:5px;font-size:.92em;white-space:nowrap}
+.wiki::before{content:"◈ ";opacity:.55}
+label.tick{display:flex;gap:11px;align-items:flex-start;padding:10px;margin:4px -6px;border-radius:9px;
+  cursor:pointer;border:1px solid transparent;-webkit-tap-highlight-color:transparent}
+label.tick:active{background:var(--hover);border-color:var(--hoveredge)}
+label.tick input{width:22px;height:22px;margin:1px 0 0;flex:0 0 auto;accent-color:var(--accent)}
+label.tick.done>span{opacity:.5;text-decoration:line-through}
+label.cardtick{background:var(--chip);border-color:var(--hoveredge);display:inline-flex;
+  font-size:.92em;font-weight:600;color:var(--chipink);margin:2px 0 8px;padding:8px 12px}
+details.card.done{opacity:.65}
+#app .empty{color:var(--dim);text-align:center;margin:40px 0}
+footer{text-align:center;color:var(--dim);font-size:.82rem;margin-top:26px}
+footer button,#keyform button{font:inherit;color:var(--accent);background:none;border:1px solid var(--hoveredge);
+  border-radius:8px;padding:7px 14px;cursor:pointer;margin:6px 3px 0}
+#keyform{max-width:420px;margin:14vh auto 0;text-align:center}
+#keyform h2{font-size:1.2rem}
+#keyform p{color:var(--dim);font-size:.9rem}
+#keyform input{font:inherit;width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--edge);
+  background:var(--card);color:var(--ink)}
+#keyform .err{color:#d33;font-size:.86rem;min-height:1.2em;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap" id="root"></div>
+<script src="./app.js"></script>
+<script>
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js");
+</script>
+</body>
+</html>

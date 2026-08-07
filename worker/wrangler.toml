@@ -1,0 +1,14 @@
+name = "crystal-brief"
+main = "src/index.js"
+compatibility_date = "2026-07-01"
+account_id = "bd5fef067bffb5780b2fd25770606075"
+workers_dev = true
+# one live origin only, same policy as the mise worker
+preview_urls = false
+
+# Secret (set via `npx wrangler secret put`, NEVER here):
+#   BRIEF_KEY  - the one shared key; laptop and phone both present it.
+
+[[kv_namespaces]]
+binding = "STORE"
+id = "9042abd7aa52412396591702b06d066a"
