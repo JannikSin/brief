@@ -4,7 +4,7 @@
 // keeps its own last-known copy in localStorage.
 // Cache name must stay brief-prefixed: the three PWAs share the
 // janniksin.github.io origin and each SW deletes only its own prefix.
-const CACHE = "brief-v1";
+const CACHE = "brief-v2";
 
 const PRECACHE = [
   "./",
