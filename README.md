@@ -5,8 +5,9 @@ A small installable web app (PWA) that shows a personal daily brief on a phone.
 This repo is only the app shell: HTML, CSS, JS, icons. It contains no content
 and no personal data. At runtime the app fetches its content as JSON from a
 private Cloudflare Worker, authenticated with a key the user pastes once
-(stored in localStorage on the device). Checkbox state is posted back to the
-same Worker.
+(stored in localStorage on the device). Checkbox state and free-text capture
+notes are posted back to the same Worker, offline-queued; a day switcher opens
+the previous week's briefs from the Worker's per-date store.
 
 - `index.html` + `app.js`: the whole app, no frameworks, no build step.
 - `sw.js`: offline shell cache (the last fetched brief is kept in localStorage).
