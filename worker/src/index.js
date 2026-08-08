@@ -3,9 +3,11 @@
 // KV, behind a single secret key (BRIEF_KEY, a Worker secret).
 //
 //   POST /brief          laptop pushes the day's brief JSON  {date, ...}
-//   GET  /brief[?date=]  app fetches latest (or a specific date)
+//   GET  /brief[?date=]  app fetches latest (or a specific date; history)
 //   POST /ticks          app pushes one checkbox delta       {date, id, done, ...}
 //   GET  /ticks?date=    laptop pulls a day's tick state
+//   POST /capture        app pushes a free-text note         {date, text, at}
+//   GET  /capture?date=  laptop pulls a day's captures
 //
 // Auth on every route: x-brief-key header or ?key= query param.
 // ponytail: single-user KV read-modify-write on /ticks; last write wins.
@@ -66,7 +68,12 @@ export default {
       }
       if (!DATE_RE.test(brief?.date || "")) return json(400, { error: "brief.date required" });
       await env.STORE.put(`brief:${brief.date}`, raw);
-      await env.STORE.put("brief:latest", raw);
+      // backfilling an older day (history) must not clobber the phone's latest
+      let latestDate = "";
+      try {
+        latestDate = JSON.parse((await env.STORE.get("brief:latest")) || "{}").date || "";
+      } catch {}
+      if (brief.date >= latestDate) await env.STORE.put("brief:latest", raw);
       return json(200, { ok: true, date: brief.date, bytes: raw.length });
     }
 
@@ -115,6 +122,45 @@ export default {
       const out = { date, items, updated: new Date().toISOString() };
       await env.STORE.put(key, JSON.stringify(out));
       return json(200, { ok: true, done: Object.keys(items).length });
+    }
+
+    if (url.pathname === "/capture" && request.method === "GET") {
+      if (!qdate) return json(400, { error: "date required" });
+      const raw = await env.STORE.get(`capture:${qdate}`);
+      return new Response(raw || JSON.stringify({ date: qdate, items: [] }), {
+        headers: { "content-type": "application/json", "cache-control": "no-store", ...CORS },
+      });
+    }
+
+    if (url.pathname === "/capture" && request.method === "POST") {
+      const raw = await request.text();
+      if (raw.length > MAX_BODY) return json(413, { error: "too large" });
+      let body;
+      try {
+        body = JSON.parse(raw);
+      } catch {
+        return json(400, { error: "invalid JSON" });
+      }
+      const date = body?.date || "";
+      const text = String(body?.text ?? "").trim();
+      if (!DATE_RE.test(date)) return json(400, { error: "date required" });
+      if (!text) return json(400, { error: "text required" });
+      const key = `capture:${date}`;
+      let cur = {};
+      try {
+        cur = JSON.parse((await env.STORE.get(key)) || "{}");
+      } catch {
+        cur = {};
+      }
+      const items = Array.isArray(cur.items) ? cur.items : [];
+      if (items.length >= 200) return json(429, { error: "capture full for the day" });
+      items.push({
+        text: clip(text, 2000),
+        at: clip(body.at, 40) || new Date().toISOString(),
+        via: "phone",
+      });
+      await env.STORE.put(key, JSON.stringify({ date, items, updated: new Date().toISOString() }));
+      return json(200, { ok: true, count: items.length });
     }
 
     return json(404, { error: "not found" });
